@@ -1,0 +1,1 @@
+This is code for converting between HEX, Signed Frac, Signed integer and Binary numbers. Needed it for a project so decided to make it for ourselves. To chack nr. just change the argument into the number needed and it should work.
