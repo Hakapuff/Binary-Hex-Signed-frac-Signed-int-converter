@@ -1,0 +1,100 @@
+import sys
+import string
+import math
+
+Argument = str(sys.argv[1])
+#Argument = "0111111111111111"
+#Argumet = "0000000000000000"
+
+# Takes binary number to signed frac
+def Binary_Signed_Frac(Binary):
+    is_negative = Binary[0] == '1'
+    int_value = int(Binary, 2)
+    if is_negative:
+        int_value -= 2 ** len(Binary)
+    fractional_value = int_value / (2 ** 15)
+    return fractional_value
+
+def Binary_Signed_Integer(Binary):
+    int_value = int(Binary, 2)
+    if Binary[0] == '1':
+        int_value -= 2 ** len(Binary)
+    return int_value
+
+def Frac_To_Binary(Frac):
+    Frac = float(Frac)
+    min_distance = float('inf')
+    closest_result = 0
+    closest_binary = None
+    for Number in range(-32768, 32768):
+        binary = '{0:016b}'.format(Number & 0xFFFF)
+        result = Binary_Signed_Frac(binary)
+        distance = abs(result - Frac)
+        if distance < min_distance:
+            min_distance = distance
+            closest_result = result
+            closest_binary = binary
+            if min_distance == 0:
+                break
+    return [closest_result, closest_binary]
+
+def Deturm_Argument(Argument):
+    if len(Argument) == 16 and all(c in '01' for c in Argument):
+        return "BINARY"
+    if "." in Argument:
+        return "FRAC"
+    elif "x" in Argument or "X" in Argument:
+        return "HEX"
+    else:
+        return "NUMERICAL"
+
+print("+------------------NUMBER CONVERTER BY HOIMARK------------------+")
+print("  YOUR ARGUMENT IS\t\t\t: " + Argument)
+State = Deturm_Argument(Argument)
+print("  I HAVE IDENTIFIED YOUR ARGUMENT AS\t: " + State)
+print("+---------------------------------------------------------------+")
+
+if State == "NUMERICAL":
+    hex_value = "0x{:04X}".format(int(Argument) & 0xFFFF)
+    print("| HEX\t\t\t: " + hex_value + "\t\t\t\t\t|")
+    Binary = '{0:016b}'.format(int(Argument) & 0xFFFF)
+    Frac = Binary_Signed_Frac(Binary)
+    Inte = Binary_Signed_Integer(Binary)
+    print("| BINARY\t\t: " + str(Binary) + "\t\t\t|")
+    print("| SIGNED FRAC\t\t: %0.12f" % Frac + "\t\t\t|")
+    print("| SIGNED INTEGER\t: " + str(Argument) + "\t\t\t\t\t|")
+    print("+---------------------------------------------------------------+")
+elif State == "HEX":
+    Argument = int(Argument, 16)
+    Binary = '{0:016b}'.format(Argument & 0xFFFF)
+    Frac = Binary_Signed_Frac(Binary)
+    Inte = Binary_Signed_Integer(Binary)
+    hex_value = "0x{:04X}".format(Argument & 0xFFFF)
+    print("| HEX\t\t\t: " + hex_value + "\t\t\t\t\t|")
+    print("| BINARY\t\t: " + str(Binary) + "\t\t\t|")
+    print("| SIGNED FRAC\t\t: %0.12f" % Frac + "\t\t\t|")
+    print("| SIGNED INTEGER\t: " + str(Inte) + "\t\t\t\t\t|")
+    print("+---------------------------------------------------------------+")
+elif State == "BINARY":
+    Argument_Int = Binary_Signed_Integer(Argument)
+    hex_value = "0x{:04X}".format(Argument_Int & 0xFFFF)
+    Frac = Binary_Signed_Frac(Argument)
+    Inte = Binary_Signed_Integer(Argument)
+    print("| HEX\t\t\t: " + hex_value + "\t\t\t\t\t|")
+    print("| BINARY\t\t: " + str(Argument) + "\t\t\t|")
+    print("| SIGNED FRAC\t\t: %0.12f" % Frac + "\t\t\t|")
+    print("| SIGNED INTEGER\t: " + str(Inte) + "\t\t\t\t\t|")
+    print("+---------------------------------------------------------------+")
+else:
+    Return_Result = Frac_To_Binary(Argument)
+    print("| CLOSEST FRACTION POSSIBLE TO REPRESENT : " + str(Return_Result[0]) + "\t|")
+    Argument_Int = int(Binary_Signed_Integer(Return_Result[1]))
+    print("| BINARY\t\t: " + str(Return_Result[1]) + "\t\t\t|")
+    print("| SIGNED FRAC\t\t: %0.12f" % float(Return_Result[0]) + "\t\t\t|")
+    Inte = Binary_Signed_Integer(Return_Result[1])
+    num = Inte
+    if num < 0:
+        num += 65536
+    print("| HEX\t\t\t: " + str(hex(num)) + "\t\t\t\t\t|")
+    print("| SIGNED INTEGER\t: " + str(Inte) + "\t\t\t\t\t|")
+    print("+---------------------------------------------------------------+")
